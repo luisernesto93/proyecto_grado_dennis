@@ -1,0 +1,129 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RolController;
+use App\Http\Controllers\CategoriaProductoController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\VehiculoController;
+use App\Http\Controllers\DistribuidorController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\HojaDespachoController;
+use App\Http\Controllers\BitacoraController;
+
+use App\Http\Controllers\PedidoDetalleController;
+
+// Locale Switch Route
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
+
+// Redirect root to login
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+// Dashboard page
+Route::get('/dashboard', function () {
+    return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
+})->middleware(['auth'])->name('dashboard');
+
+// calender pages
+Route::get('/calendar', function () {
+    return view('pages.calender', ['title' => 'Calendar']);
+})->name('calendar');
+
+// profile pages
+Route::get('/profile', function () {
+    return view('pages.profile', ['title' => 'Profile']);
+})->name('profile');
+
+// form pages
+Route::get('/form-elements', function () {
+    return view('pages.form.form-elements', ['title' => 'Form Elements']);
+})->name('form-elements');
+
+// tables pages
+Route::get('/basic-tables', function () {
+    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
+})->name('basic-tables');
+
+// pages
+
+Route::get('/blank', function () {
+    return view('pages.blank', ['title' => 'Blank']);
+})->name('blank');
+
+// error pages
+Route::get('/error-404', function () {
+    return view('pages.errors.error-404', ['title' => 'Error 404']);
+})->name('error-404');
+
+// chart pages
+Route::get('/line-chart', function () {
+    return view('pages.chart.line-chart', ['title' => 'Line Chart']);
+})->name('line-chart');
+
+Route::get('/bar-chart', function () {
+    return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
+})->name('bar-chart');
+
+
+
+// ui elements pages
+Route::get('/alerts', function () {
+    return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
+})->name('alerts');
+
+Route::get('/avatars', function () {
+    return view('pages.ui-elements.avatars', ['title' => 'Avatars']);
+})->name('avatars');
+
+Route::get('/badge', function () {
+    return view('pages.ui-elements.badges', ['title' => 'Badges']);
+})->name('badges');
+
+Route::get('/buttons', function () {
+    return view('pages.ui-elements.buttons', ['title' => 'Buttons']);
+})->name('buttons');
+
+Route::get('/image', function () {
+    return view('pages.ui-elements.images', ['title' => 'Images']);
+})->name('images');
+
+Route::get('/videos', function () {
+    return view('pages.ui-elements.videos', ['title' => 'Videos']);
+})->name('videos');
+
+require __DIR__.'/auth.php';
+
+Route::resource('roles', RolController::class)->parameters(['roles' => 'role']);
+Route::resource('categorias', CategoriaProductoController::class)->parameters(['categorias' => 'categoria']);
+Route::resource('clientes', ClienteController::class)->parameters(['clientes' => 'cliente']);
+Route::resource('vehiculos', VehiculoController::class)->parameters(['vehiculos' => 'vehiculo']);
+Route::resource('distribuidores', DistribuidorController::class)->parameters(['distribuidores' => 'distribuidor']);
+Route::resource('usuarios', UsuarioController::class)->parameters(['usuarios' => 'usuario'])->middleware(['auth']);
+
+Route::resource('productos', ProductoController::class)->parameters(['productos' => 'producto'])->middleware(['auth']);
+
+Route::resource('pedidos', PedidoController::class)->parameters(['pedidos' => 'pedido'])->middleware(['auth']);
+
+Route::resource('hoja-despacho', HojaDespachoController::class)->parameters(['hoja-despacho' => 'despacho'])->middleware(['auth']);
+
+Route::get('/bitacora', [BitacoraController::class, 'index'])->name('bitacora.index')->middleware('auth');
+Route::get('/bitacora/{bitacora}', [BitacoraController::class, 'show'])->name('bitacora.show')->middleware('auth');
+
+Route::get('/pedidos/{pedido}/detalles', [App\Http\Controllers\PedidoDetalleController::class, 'index'])->name('pedidos.detalles.index')->middleware('auth');
+Route::get('/pedidos/{pedido}/detalles/create', [App\Http\Controllers\PedidoDetalleController::class, 'create'])->name('pedidos.detalles.create')->middleware('auth');
+Route::post('/pedidos/{pedido}/detalles', [App\Http\Controllers\PedidoDetalleController::class, 'store'])->name('pedidos.detalles.store')->middleware('auth');
+Route::delete('/pedidos/{pedido}/detalles/{detalle}', [App\Http\Controllers\PedidoDetalleController::class, 'destroy'])->name('pedidos.detalles.destroy')->middleware('auth');
+Route::post('/pedidos/{pedido}/confirmar', [App\Http\Controllers\PedidoController::class, 'confirmar'])->name('pedidos.confirmar')->middleware('auth');
+
+Route::get('/hoja-despacho/{despacho}/detalles', [App\Http\Controllers\DespachoDetalleController::class, 'index'])->name('despachos.detalles.index')->middleware('auth');
+Route::get('/hoja-despacho/{despacho}/detalles/create', [App\Http\Controllers\DespachoDetalleController::class, 'create'])->name('despachos.detalles.create')->middleware('auth');
+Route::post('/hoja-despacho/{despacho}/detalles', [App\Http\Controllers\DespachoDetalleController::class, 'store'])->name('despachos.detalles.store')->middleware('auth');
+Route::get('/hoja-despacho/{despacho}/detalles/{detalle}/edit', [App\Http\Controllers\DespachoDetalleController::class, 'edit'])->name('despachos.detalles.edit')->middleware('auth');
+Route::put('/hoja-despacho/{despacho}/detalles/{detalle}', [App\Http\Controllers\DespachoDetalleController::class, 'update'])->name('despachos.detalles.update')->middleware('auth');
+Route::delete('/hoja-despacho/{despacho}/detalles/{detalle}', [App\Http\Controllers\DespachoDetalleController::class, 'destroy'])->name('despachos.detalles.destroy')->middleware('auth');
+Route::post('/hoja-despacho/{despacho}/completar', [App\Http\Controllers\HojaDespachoController::class, 'completar'])->name('despachos.completar')->middleware('auth');
